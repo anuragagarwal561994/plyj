@@ -599,19 +599,24 @@ class StatementParser(object):
 
     def p_method_invocation(self, p):
         '''method_invocation : NAME '(' argument_list_opt ')' '''
-        p[0] = MethodInvocation(p[1], arguments=p[3])
+        p[0] = MethodInvocation(p[1], arguments=p[3], startLine=p.lineno(1),
+                                startLexPos=p.lexpos(1), endLine=p.lineno(4),
+                                endLexPos=p.lexpos(4))
 
     def p_method_invocation2(self, p):
         '''method_invocation : name '.' type_arguments NAME '(' argument_list_opt ')'
                              | primary '.' type_arguments NAME '(' argument_list_opt ')'
                              | SUPER '.' type_arguments NAME '(' argument_list_opt ')' '''
-        p[0] = MethodInvocation(p[4], target=p[1], type_arguments=p[3], arguments=p[6])
+        p[0] = MethodInvocation(p[4], target=p[1], type_arguments=p[3], arguments=p[6],
+                                startLine=p.lineno(4), startLexPos=p.lexpos(4),
+                                endLine=p.lineno(7), endLexPos=p.lexpos(7))
 
     def p_method_invocation3(self, p):
         '''method_invocation : name '.' NAME '(' argument_list_opt ')'
                              | primary '.' NAME '(' argument_list_opt ')'
                              | SUPER '.' NAME '(' argument_list_opt ')' '''
-        p[0] = MethodInvocation(p[3], target=p[1], arguments=p[5])
+        p[0] = MethodInvocation(p[3], target=p[1], arguments=p[5], startLine=p.lineno(3),
+                                startLexPos=p.lexpos(3), endLine=p.lineno(6), endLexPos=p.lexpos(6))
 
     def p_labeled_statement(self, p):
         '''labeled_statement : label ':' statement'''

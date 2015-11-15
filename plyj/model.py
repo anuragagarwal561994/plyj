@@ -499,9 +499,11 @@ class ArrayInitializer(SourceElement):
 
 
 class MethodInvocation(Expression):
-    def __init__(self, name, arguments=None, type_arguments=None, target=None):
+    def __init__(self, name, arguments=None, type_arguments=None, target=None,
+                 startLine=-1, startLexPos=-1, endLine=-1, endLexPos=-1):
         super(MethodInvocation, self).__init__()
-        self._fields = ['name', 'arguments', 'type_arguments', 'target']
+        self._fields = ['name', 'arguments', 'type_arguments', 'target',
+                        'startLine', 'startLexPos', 'endLine', 'endLexPos']
         if arguments is None:
             arguments = []
         if type_arguments is None:
@@ -510,6 +512,10 @@ class MethodInvocation(Expression):
         self.arguments = arguments
         self.type_arguments = type_arguments
         self.target = target
+        self.startLine = startLine
+        self.startLexPos = startLexPos
+        self.endLine = endLine
+        self.endLexPos = endLexPos
 
 class IfThenElse(Statement):
 
