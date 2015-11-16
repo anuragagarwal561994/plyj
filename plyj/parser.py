@@ -1729,9 +1729,9 @@ class ClassParser(object):
         '''argument_list : expression
                          | argument_list ',' expression'''
         if len(p) == 2:
-            p[0] = [p[1]]
+            p[0] = [{'commaLexPos': None, 'startLexPos': p.lexspan(1)[0], 'value': p[1]}]
         else:
-            p[0] = p[1] + [p[3]]
+            p[0] = p[1] + [{'commaLexPos': p.lexpos(2), 'startLexPos': p.lexspan(3)[0], 'value':p[3]}]
 
     def p_enum_body_declarations_opt(self, p):
         '''enum_body_declarations_opt : enum_declarations'''
@@ -2011,6 +2011,7 @@ class Parser(object):
     def __init__(self):
         self.lexer = lex.lex(module=MyLexer(), optimize=1)
         self.parser = yacc.yacc(module=MyParser(), start='goal', optimize=1)
+        self.prefix_length = 0
 
     def tokenize_string(self, code):
         self.lexer.input(code)
@@ -2033,7 +2034,8 @@ class Parser(object):
 
     def parse_string(self, code, debug=0, lineno=1, prefix='++'):
         self.lexer.lineno = lineno
-        return self.parser.parse(prefix + code, lexer=self.lexer, debug=debug)
+        self.prefix_length = len(prefix)
+        return self.parser.parse(prefix + code, lexer=self.lexer, debug=debug, tracking=True)
 
     def parse_file(self, _file, debug=0):
         if type(_file) == str:
@@ -2057,7 +2059,7 @@ if __name__ == '__main__':
             print(token)
 
         print('parsing expression {}'.format(expr))
-        t = parser.parse(expr, lexer=lexer, debug=1)
+        t = parser.parse(expr, lexer=lexer, debug=1, tracking=True)
         print('result: {}'.format(t))
         print('--------------------------------')
 
