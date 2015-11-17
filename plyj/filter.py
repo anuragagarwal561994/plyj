@@ -11,7 +11,7 @@ class BaseFilter(model.Visitor):
         if not isinstance(filter_dict, dict):
             raise Exception("Expected dictionary argument")
 
-        self._filter_dict_items = filter_dict.items()
+        self._filter_dict = filter_dict
         self.instances = []
 
     def clean_instances(self):
@@ -23,9 +23,11 @@ class MethodInvocationFilter(BaseFilter):
         super(MethodInvocationFilter, self).__init__(filter_dict)
 
     def visit_MethodInvocation(self, method_invocation):
-        current_value_items = method_invocation.__dict__.items()
-        if all(item in current_value_items for item in self._filter_dict_items):
+        method_invocation_dict = method_invocation.__dict__
+        if all(value(method_invocation_dict[key]) for key, value in self._filter_dict.iteritems()):
             self.instances.append(method_invocation)
+
+        return True
 
 
 if __name__ == '__main__':
@@ -38,7 +40,9 @@ if __name__ == '__main__':
         'web.addJavascriptInterface()',
     ]
 
-    filter = MethodInvocationFilter({'name': 'addJavascriptInterface'})
+    filter = MethodInvocationFilter(
+        {'name': lambda x: x == 'addJavascriptInterface'}
+    )
 
     for expr in expressions:
         tree = p.parse_expression(expr)
